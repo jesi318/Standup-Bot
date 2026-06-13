@@ -1,11 +1,16 @@
 import type { ModalSubmitInteraction } from "discord.js";
 import { submitStandup } from "../services/standupService.js";
 import { STANDUP_MODAL_ID } from "../components/standupModal.js";
+import { STANDUP_CONFIG_MODAL_ID } from "../components/standupConfigModal.js";
+import { saveGuildSettings } from "../services/guildSettingsService.js";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
     switch (interaction.customId) {
         case STANDUP_MODAL_ID:
             await handleStandupModalSubmit(interaction);
+            break;
+        case STANDUP_CONFIG_MODAL_ID:
+            await handleStandupConfigModalSubmit(interaction);
             break;
         default:
             await interaction.reply({
@@ -13,6 +18,27 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
                 ephemeral: true,
             });
     }
+}
+
+async function handleStandupConfigModalSubmit(interaction: ModalSubmitInteraction) {
+    const frequency = interaction.fields.getTextInputValue('frequency');
+    const time = interaction.fields.getTextInputValue('time');
+    const timezone = interaction.fields.getTextInputValue('timezone');
+
+    const inGuild = await checkifinGuild(interaction);
+    if (!inGuild) return;
+
+    saveGuildSettings(
+        interaction.guildId!,
+        interaction.channelId!,
+        frequency,
+        time,
+        timezone
+    );
+
+    await interaction.reply({
+        content: `Standup settings updated successfully to **${frequency}** at **${time}** ${timezone} 🗓️`,
+    });
 }
 
 async function handleStandupModalSubmit(interaction: ModalSubmitInteraction) {

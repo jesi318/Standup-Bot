@@ -20,4 +20,14 @@ CREATE TABLE IF NOT EXISTS standups (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )
 `)
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS guild_settings (
+    guild_id TEXT PRIMARY KEY,
+    channel_id TEXT NOT NULL,
+    frequency TEXT NOT NULL,
+    schedule_time TEXT NOT NULL,
+    timezone TEXT NOT NULL
+);
+`);
 }
