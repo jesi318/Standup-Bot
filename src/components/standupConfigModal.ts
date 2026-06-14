@@ -7,7 +7,7 @@ export function createStandupConfigModal() {
         .setCustomId("frequency")
         .setLabel("Frequency")
         .setStyle(TextInputStyle.Short)
-        .setPlaceholder("daily, weekly")
+        .setPlaceholder("daily, weekly:monday, weekly:tuesday etc..")
         .setRequired(true);
 
     const time = new TextInputBuilder()
@@ -21,7 +21,7 @@ export function createStandupConfigModal() {
         .setCustomId("timezone")
         .setLabel("Timezone")
         .setStyle(TextInputStyle.Short)
-        .setPlaceholder("UTC, GMT, etc.")
+        .setPlaceholder("Asia/Kolkata, America/New_York etc..")
         .setRequired(true);
 
     return new ModalBuilder()

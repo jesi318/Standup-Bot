@@ -3,6 +3,7 @@ import { submitStandup } from "../services/standupService.js";
 import { STANDUP_MODAL_ID } from "../components/standupModal.js";
 import { STANDUP_CONFIG_MODAL_ID } from "../components/standupConfigModal.js";
 import { saveGuildSettings } from "../services/guildSettingsService.js";
+import { VALID_WEEKDAYS } from "../constants/weekdays.js";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
     switch (interaction.customId) {
@@ -21,24 +22,57 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
 }
 
 async function handleStandupConfigModalSubmit(interaction: ModalSubmitInteraction) {
-    const frequency = interaction.fields.getTextInputValue('frequency');
-    const time = interaction.fields.getTextInputValue('time');
-    const timezone = interaction.fields.getTextInputValue('timezone');
+    const frequency = interaction.fields.getTextInputValue('frequency').trim().toLowerCase();
+    const time = interaction.fields.getTextInputValue('time').trim();
+    const timezone = interaction.fields.getTextInputValue('timezone').trim();
 
     const inGuild = await checkifinGuild(interaction);
     if (!inGuild) return;
 
-    saveGuildSettings(
-        interaction.guildId!,
-        interaction.channelId!,
-        frequency,
-        time,
-        timezone
-    );
+    if (!isValidFrequencyInput(frequency)) {
+        await interaction.reply({
+            content: "Invalid frequency. Please enter 'daily' or 'weekly:weekday'.",
+            ephemeral: true,
+        });
+        return;
+    }
 
-    await interaction.reply({
-        content: `Standup settings updated successfully to **${frequency}** at **${time}** ${timezone} 🗓️`,
-    });
+    if (!isValidTimeInput(time)) {
+        await interaction.reply({
+            content: "Invalid time format. Please enter time in HH:mm format (24-hour).",
+            ephemeral: true,
+        });
+        return;
+    }
+
+    if (!isValidTimezoneInput(timezone)) {
+        await interaction.reply({
+            content: "Invalid timezone. Please enter a valid timezone ('America/New_York').",
+            ephemeral: true,
+        });
+        return;
+    }
+
+    try {
+        saveGuildSettings(
+            interaction.guildId!,
+            interaction.channelId!,
+            frequency,
+            time,
+            timezone
+        );
+
+        await interaction.reply({
+            content: `Standup settings updated successfully to **${frequency}** at **${time}** ${timezone} 🗓️`,
+        });
+    } catch (error) {
+        await interaction.reply({
+            content:
+                error instanceof Error
+                    ? error.message
+                    : "Failed to save standup settings.",
+        });
+    }
 }
 
 async function handleStandupModalSubmit(interaction: ModalSubmitInteraction) {
@@ -48,7 +82,7 @@ async function handleStandupModalSubmit(interaction: ModalSubmitInteraction) {
 
     const inGuild = await checkifinGuild(interaction);
     if (!inGuild) return;
-    
+
     submitStandup(
         interaction.guildId!,
         interaction.user.id,
@@ -77,3 +111,33 @@ async function checkifinGuild(interaction: ModalSubmitInteraction) {
     }
     return true;
 }
+
+
+// #region helpers
+function isValidFrequencyInput(frequency: string): boolean {
+    if (frequency === "daily") {
+        return true;
+    }
+    if (frequency.startsWith("weekly:")) {
+        const [, day] = frequency.split(":");
+
+        return VALID_WEEKDAYS.includes(day as typeof VALID_WEEKDAYS[number])
+
+    }
+    return false;
+}
+
+function isValidTimeInput(time: string): boolean {
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    return timeRegex.test(time);
+}
+
+function isValidTimezoneInput(timezone: string): boolean {
+    try {
+        Intl.DateTimeFormat(undefined, { timeZone: timezone });
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+// #endregion
