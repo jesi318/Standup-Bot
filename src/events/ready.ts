@@ -1,4 +1,5 @@
 import { Client, Events } from "discord.js"
+import { startStandupScheduler } from "../shedulers/standupScheduler.js"
 
 const readyEvent = {
   name: Events.ClientReady,
@@ -8,6 +9,8 @@ const readyEvent = {
     console.log(
       `Ready! Logged in as ${client.user.tag}`
     )
+
+    startStandupScheduler(client)
   },
 }
 
