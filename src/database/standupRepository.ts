@@ -55,3 +55,14 @@ export function getLatestStandupforGuild(guildId: string) {
   `);
   return stmt.all(guildId);
 }
+
+export function getGuildStandupHistory(guildId: string, userId: string, limit: number, offset: number) {
+  const stmt = db.prepare(`
+    SELECT * FROM standups
+    WHERE guild_id = ? AND user_id = ?
+    ORDER BY standup_date DESC
+    LIMIT ?
+    OFFSET ?
+  `);
+  return stmt.all(guildId, userId, limit, offset);
+}

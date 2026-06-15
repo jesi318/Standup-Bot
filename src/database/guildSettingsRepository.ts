@@ -30,8 +30,14 @@ export function getGuildSettings(
         FROM guild_settings
         WHERE guild_id = ?
     `);
+    
+    const row = statement.get(guildId);
 
-    return toGuildSettings(statement.get(guildId));
+    if (!row) {
+        return undefined;
+    }
+
+    return toGuildSettings(row);
 }
 
 export function getAllGuildSettings() {

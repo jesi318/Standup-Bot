@@ -1,5 +1,5 @@
 import { getGuildSettings } from "../database/guildSettingsRepository.js";
-import { upsertStandup, getLatestStandupforGuild, getLatestStandupforUser } from "../database/standupRepository.js";
+import { upsertStandup, getLatestStandupforGuild, getLatestStandupforUser, getGuildStandupHistory } from "../database/standupRepository.js";
 
 
 export function submitStandup(guildId: string, userId: string, username: string, yesterday: string, today: string, blockers: string) {
@@ -33,6 +33,10 @@ export function getLatestStandupUser(guildId: string, userId: string) {
 
 export function getLatestStandupGuild(guildId: string) {
     return getLatestStandupforGuild(guildId);
+}
+
+export function getStandupHistory(guildId: string, userId: string, limit: number = 5, offset: number = 0) {
+    return getGuildStandupHistory(guildId, userId, limit, offset);
 }
 
 
