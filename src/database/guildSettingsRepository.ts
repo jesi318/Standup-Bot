@@ -1,3 +1,4 @@
+import type { GuildSettings } from "../types/guildSettings.js";
 import { db } from "./db.js";
 
 export function createorUpdateGuildSettings(guildId: string, channelId: string, frequency: string, scheduleTime: string, timezone: string) {
@@ -30,7 +31,7 @@ export function getGuildSettings(
         WHERE guild_id = ?
     `);
 
-    return statement.get(guildId);
+    return toGuildSettings(statement.get(guildId));
 }
 
 export function getAllGuildSettings() {
@@ -39,5 +40,15 @@ export function getAllGuildSettings() {
         FROM guild_settings
     `);
 
-    return statement.all();
+    return statement.all().map(toGuildSettings);
+}
+
+function toGuildSettings(row: any): GuildSettings {
+    return {
+        guildId: row.guild_id,
+        channelId: row.channel_id,
+        frequency: row.frequency,
+        scheduleTime: row.schedule_time,
+        timezone: row.timezone,
+    };
 }

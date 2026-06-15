@@ -25,8 +25,6 @@ const command : SlashCommand = {
             return;
         }  
 
-        console.log(standup);
-
         const formattedStandups = standup.map((s: any) => `
             ## ${s.username}'s Latest Standup
 
@@ -40,7 +38,7 @@ const command : SlashCommand = {
             ${s.blockers}
 
             **Submitted At**
-            ${s.created_at}
+            ${s.standup_date}
         `).join("\n--------------------------\n");
 
         await interaction.reply({content: formattedStandups});

@@ -41,7 +41,7 @@ const command : SlashCommand = {
             ${standup.blockers}
 
             **Submitted At**
-            ${standup.created_at}
+            ${standup.standup_date}
             `,
         });
         

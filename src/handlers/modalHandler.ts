@@ -1,9 +1,9 @@
-import type { ModalSubmitInteraction } from "discord.js";
+import { PermissionFlagsBits, type ModalSubmitInteraction } from "discord.js";
 import { submitStandup } from "../services/standupService.js";
 import { STANDUP_MODAL_ID } from "../components/standupModal.js";
 import { STANDUP_CONFIG_MODAL_ID } from "../components/standupConfigModal.js";
 import { saveGuildSettings } from "../services/guildSettingsService.js";
-import { VALID_WEEKDAYS } from "../constants/weekdays.js";
+import { VALID_WEEKDAYS } from "../utils/constants/weekdays.js";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
     switch (interaction.customId) {
@@ -22,6 +22,20 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
 }
 
 async function handleStandupConfigModalSubmit(interaction: ModalSubmitInteraction) {
+    if (
+    !interaction.memberPermissions?.has(
+        PermissionFlagsBits.ManageGuild
+    )
+) {
+    await interaction.reply({
+        content:
+            "❌ Only server managers can configure standups.",
+        ephemeral: true,
+    });
+
+    return;
+}
+    
     const frequency = interaction.fields.getTextInputValue('frequency').trim().toLowerCase();
     const time = interaction.fields.getTextInputValue('time').trim();
     const timezone = interaction.fields.getTextInputValue('timezone').trim();
@@ -83,6 +97,8 @@ async function handleStandupModalSubmit(interaction: ModalSubmitInteraction) {
     const inGuild = await checkifinGuild(interaction);
     if (!inGuild) return;
 
+    try{
+
     submitStandup(
         interaction.guildId!,
         interaction.user.id,
@@ -97,6 +113,15 @@ async function handleStandupModalSubmit(interaction: ModalSubmitInteraction) {
             "Standup submitted successfully! 🫡",
         ephemeral: true,
     });
+} catch (error) {
+    await interaction.reply({
+        content:
+            error instanceof Error
+                ? error.message
+                : "Failed to submit standup.",
+        ephemeral: true,
+    });
+}
 }
 
 async function checkifinGuild(interaction: ModalSubmitInteraction) {
@@ -120,7 +145,6 @@ function isValidFrequencyInput(frequency: string): boolean {
     }
     if (frequency.startsWith("weekly:")) {
         const [, day] = frequency.split(":");
-
         return VALID_WEEKDAYS.includes(day as typeof VALID_WEEKDAYS[number])
 
     }

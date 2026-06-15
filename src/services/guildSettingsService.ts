@@ -1,4 +1,4 @@
-import { VALID_WEEKDAYS } from "../constants/weekdays.js";
+import { VALID_WEEKDAYS } from "../utils/constants/weekdays.js";
 import { createorUpdateGuildSettings, getAllGuildSettings, getGuildSettings } from "../database/guildSettingsRepository.js";
 
 export function saveGuildSettings(guildId: string, channelId: string, frequency: string, scheduleTime: string, timezone: string) {

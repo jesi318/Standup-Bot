@@ -1,8 +1,30 @@
-import { createStandup, getLatestStandupforGuild, getLatestStandupforUser } from "../database/standupRepository.js";
+import { getGuildSettings } from "../database/guildSettingsRepository.js";
+import { upsertStandup, getLatestStandupforGuild, getLatestStandupforUser } from "../database/standupRepository.js";
 
 
 export function submitStandup(guildId: string, userId: string, username: string, yesterday: string, today: string, blockers: string) {
-    return createStandup(guildId, userId, username, yesterday, today, blockers);
+    const settings = getGuildSettings(guildId);
+
+    if (!settings) {
+        throw new Error(
+            "Guild settings not configured. use /standup-config to set up the bot for your server."
+        );
+    }
+
+    const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: settings.timezone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    }).formatToParts(new Date());
+
+    const year = parts.find(p => p.type === "year")!.value;
+    const month = parts.find(p => p.type === "month")!.value;
+    const day = parts.find(p => p.type === "day")!.value;
+
+    const standupDate = `${year}-${month}-${day}`;
+
+    return upsertStandup(guildId, userId, username, yesterday, today, blockers, standupDate);
 }
 
 export function getLatestStandupUser(guildId: string, userId: string) {

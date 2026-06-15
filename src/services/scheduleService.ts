@@ -17,6 +17,7 @@ export function shouldSendReminder(setting: GuildSettings): boolean {
 
     const currentTime = timeFormatter.format(now);
     const currentWeekday = weekdayFormatter.format(now).toLowerCase();
+
     if (setting.frequency === "daily") {
         return currentTime === setting.scheduleTime;
     }
