@@ -1,6 +1,7 @@
+import type { StandupSubmission } from "../models/standupSubmission.js";
 import { db } from "./db.js";
 
-export function upsertStandup(guildId: string, userId: string, username: string, yesterday: string, today: string, blockers: string, standupDate: string) {
+export function upsertStandup(submission: StandupSubmission, standupDate: string) {
   const stmt = db.prepare(`
     INSERT INTO standups (guild_id, user_id, username, yesterday, today, blockers, standup_date)
     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -19,7 +20,13 @@ export function upsertStandup(guildId: string, userId: string, username: string,
             today = excluded.today,
             blockers = excluded.blockers
   `);
-  stmt.run(guildId, userId, username, yesterday, today, blockers, standupDate);
+  stmt.run(submission.guildId,
+    submission.userId,
+    submission.username,
+    submission.yesterday,
+    submission.today,
+    submission.blockers,
+    standupDate);
 }
 
 export function getStandupByDate(guildId: string, userId: string, standupDate: string) {

@@ -4,6 +4,9 @@ import { STANDUP_MODAL_ID } from "../components/standupModal.js";
 import { STANDUP_CONFIG_MODAL_ID } from "../components/standupConfigModal.js";
 import { saveGuildSettings } from "../services/guildSettingsService.js";
 import { VALID_WEEKDAYS } from "../utils/constants/weekdays.js";
+import type { StandupSubmission } from "../models/standupSubmission.js";
+import type { GuildSettings } from "../models/GuildSettings.js";
+import { ensureAuthorized } from "../utils/permissions.js";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
     switch (interaction.customId) {
@@ -22,62 +25,37 @@ export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
 }
 
 async function handleStandupConfigModalSubmit(interaction: ModalSubmitInteraction) {
-    if (
-    !interaction.memberPermissions?.has(
-        PermissionFlagsBits.ManageGuild
-    )
-) {
-    await interaction.reply({
-        content:
-            "❌ Only server managers can configure standups.",
-        ephemeral: true,
-    });
-
-    return;
-}
-    
-    const frequency = interaction.fields.getTextInputValue('frequency').trim().toLowerCase();
-    const time = interaction.fields.getTextInputValue('time').trim();
-    const timezone = interaction.fields.getTextInputValue('timezone').trim();
-
-    const inGuild = await checkifinGuild(interaction);
-    if (!inGuild) return;
-
-    if (!isValidFrequencyInput(frequency)) {
-        await interaction.reply({
-            content: "Invalid frequency. Please enter 'daily' or 'weekly:weekday'.",
-            ephemeral: true,
-        });
-        return;
-    }
-
-    if (!isValidTimeInput(time)) {
-        await interaction.reply({
-            content: "Invalid time format. Please enter time in HH:mm format (24-hour).",
-            ephemeral: true,
-        });
-        return;
-    }
-
-    if (!isValidTimezoneInput(timezone)) {
-        await interaction.reply({
-            content: "Invalid timezone. Please enter a valid timezone ('America/New_York').",
-            ephemeral: true,
-        });
-        return;
-    }
 
     try {
+        const isAdmin = await ensureAuthorized(interaction);
+        if (!isAdmin) return;
+
+        const inGuild = await checkifinGuild(interaction);
+        if (!inGuild) return;
+
+        const settings: GuildSettings = {
+            guildId: interaction.guildId!,
+            channelId: interaction.channelId!,
+            frequency: interaction.fields.getTextInputValue('frequency').trim().toLowerCase(),
+            scheduleTime: interaction.fields.getTextInputValue('time').trim(),
+            timezone: interaction.fields.getTextInputValue('timezone').trim()
+        };
+
+        const validationError = ValidateGuildSettingsInput(settings);
+
+        if (validationError) {
+            await interaction.reply({
+                content: validationError,
+                ephemeral: true,
+            });
+            return;
+        }
         saveGuildSettings(
-            interaction.guildId!,
-            interaction.channelId!,
-            frequency,
-            time,
-            timezone
+            settings
         );
 
         await interaction.reply({
-            content: `Standup settings updated successfully to **${frequency}** at **${time}** ${timezone} 🗓️`,
+            content: `Standup settings updated successfully to **${settings.frequency}** at **${settings.scheduleTime}** ${settings.timezone} 🗓️`,
         });
     } catch (error) {
         await interaction.reply({
@@ -90,40 +68,36 @@ async function handleStandupConfigModalSubmit(interaction: ModalSubmitInteractio
 }
 
 async function handleStandupModalSubmit(interaction: ModalSubmitInteraction) {
-    const yesterday = interaction.fields.getTextInputValue('yesterday');
-    const today = interaction.fields.getTextInputValue('today');
-    const blockers = interaction.fields.getTextInputValue('blockers');
 
-    const inGuild = await checkifinGuild(interaction);
-    if (!inGuild) return;
+    try {
+        const inGuild = await checkifinGuild(interaction);
+        if (!inGuild) return;
 
-    try{
+        const submission: StandupSubmission = constructStandupSubmission(interaction);
 
-    submitStandup(
-        interaction.guildId!,
-        interaction.user.id,
-        interaction.user.username,
-        yesterday,
-        today,
-        blockers
-    );
+        submitStandup(
+            submission
+        );
 
-    await interaction.reply({
-        content:
-            "Standup submitted successfully! 🫡",
-        ephemeral: true,
-    });
-} catch (error) {
-    await interaction.reply({
-        content:
-            error instanceof Error
-                ? error.message
-                : "Failed to submit standup.",
-        ephemeral: true,
-    });
-}
+        await interaction.reply({
+            content:
+                "Standup submitted successfully! 🫡",
+            ephemeral: true,
+        });
+
+    } catch (error) {
+        await interaction.reply({
+            content:
+                error instanceof Error
+                    ? error.message
+                    : "Failed to submit standup.",
+            ephemeral: true,
+        });
+    }
 }
 
+
+// #region helpers
 async function checkifinGuild(interaction: ModalSubmitInteraction) {
     if (!interaction.inGuild()) {
         await interaction.reply({
@@ -138,7 +112,6 @@ async function checkifinGuild(interaction: ModalSubmitInteraction) {
 }
 
 
-// #region helpers
 function isValidFrequencyInput(frequency: string): boolean {
     if (frequency === "daily") {
         return true;
@@ -164,4 +137,31 @@ function isValidTimezoneInput(timezone: string): boolean {
         return false;
     }
 }
+function constructStandupSubmission(interaction: ModalSubmitInteraction): StandupSubmission {
+    return {
+        guildId: interaction.guildId!,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        yesterday: interaction.fields.getTextInputValue('yesterday'),
+        today: interaction.fields.getTextInputValue('today'),
+        blockers: interaction.fields.getTextInputValue('blockers'),
+    };
+}
+
+function ValidateGuildSettingsInput(settings: GuildSettings): string | null {
+    if (!isValidFrequencyInput(settings.frequency)) {
+        return "Invalid frequency. Please enter 'daily' or 'weekly:weekday'.";
+    }
+
+    if (!isValidTimeInput(settings.scheduleTime)) {
+        return "Invalid time format. Please enter time in HH:mm format (24-hour).";
+    }
+
+    if (!isValidTimezoneInput(settings.timezone)) {
+        return "Invalid timezone. Please enter a valid timezone ('America/New_York').";
+    }
+
+    return null;
+}
+
 // #endregion

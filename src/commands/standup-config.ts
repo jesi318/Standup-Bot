@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../types/client.js";
 import { createStandupConfigModal } from "../components/standupConfigModal.js";
-import { ensureAdministrator } from "../utils/permissions.js";
+import { ensureAuthorized } from "../utils/permissions.js";
 
 const command : SlashCommand = {
     data: new SlashCommandBuilder()
@@ -9,7 +9,7 @@ const command : SlashCommand = {
         .setDescription("Configure your standup settings."),
 
     async execute(interaction) {
-       const isAdmin = await ensureAdministrator(interaction);
+       const isAdmin = await ensureAuthorized(interaction);
         
        if (!isAdmin) {
             return;

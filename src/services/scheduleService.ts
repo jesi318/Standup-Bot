@@ -1,6 +1,6 @@
-import type { GuildSettings } from "../types/guildSettings.js";
+import type { GuildSettings } from "../models/GuildSettings.js";
 
-export function shouldSendReminder(setting: GuildSettings): boolean {
+export function shouldSendReminder(setting: GuildSettings ): boolean {
     const now = new Date();
     const timeFormatter = new Intl.DateTimeFormat("en-GB", {
         timeZone: setting.timezone,

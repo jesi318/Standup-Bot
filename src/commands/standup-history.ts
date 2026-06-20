@@ -1,16 +1,21 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../types/client.js";
 import { getStandupHistory } from "../services/standupService.js";
+import { createHistoryEmbed } from "../components/historyEmbed.js";
+import { createHistoryPagination } from "../components/historyPagination.js";
+const PAGE_SIZE = 5;
 
 const command: SlashCommand = {
     data: new SlashCommandBuilder()
         .setName("standup-history")
-        .setDescription("View your recent standups.")
-        .addIntegerOption(option =>
-            option.setName("count")
-                .setDescription("Number of recent standups to display (default 5)")
-                .setRequired(false)
-        ),
+        .setDescription("View your recent standups."),
+        // .addIntegerOption(option =>
+        //     option.setName("count")
+        //         .setDescription("Number of recent standups to display (default 5)")
+        //         .setRequired(false)
+        //         .setMinValue(1)
+        //         .setMaxValue(20)
+        // ),
 
     async execute(interaction) {
         if (!interaction.inGuild()) {
@@ -21,8 +26,7 @@ const command: SlashCommand = {
             return;
         }
 
-        const count = interaction.options.getInteger("count") ?? undefined;
-        const history = getStandupHistory(interaction.guildId, interaction.user.id, count, 0)
+        const history = getStandupHistory(interaction.guildId, interaction.user.id, PAGE_SIZE + 1, 0);
 
         if (history.length === 0) {
             await interaction.reply({
@@ -32,29 +36,18 @@ const command: SlashCommand = {
             return;
         }
 
-        const embed = new EmbedBuilder().setTitle("📜 Recent Standups");
+        const hasNextPage =
+            history.length > PAGE_SIZE;
 
-        history.forEach((s: any) => {
+        const pageItems =
+            history.slice(0, PAGE_SIZE);
 
-            embed.addFields({
+        const embed  = createHistoryEmbed(pageItems, 1);
+        const pagebuttons = createHistoryPagination(1, hasNextPage);
 
-                name: `📅 ${s.standup_date}`,
-
-                value:
-                    `**Yesterday**
-                    ${s.yesterday}
-
-                    **Today**
-                    ${s.today}
-
-                    **Blockers**
-                    ${s.blockers}`
-
-            });
-
-        });
-        await interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed], components: [pagebuttons] });
     }
+  
 };
 
 export default command;

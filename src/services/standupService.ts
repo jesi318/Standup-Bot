@@ -1,10 +1,14 @@
 import { getGuildSettings } from "../database/guildSettingsRepository.js";
 import { upsertStandup, getLatestStandupforGuild, getLatestStandupforUser, getGuildStandupHistory } from "../database/standupRepository.js";
+import type { StandupSubmission } from "../models/standupSubmission.js";
+import { validateStandup } from "../validators/standupValidator.js";
 
 
-export function submitStandup(guildId: string, userId: string, username: string, yesterday: string, today: string, blockers: string) {
-    const settings = getGuildSettings(guildId);
+export function submitStandup(submission: StandupSubmission, ) {
+    const settings = getGuildSettings(submission.guildId);
 
+    validateStandup(submission);
+    
     if (!settings) {
         throw new Error(
             "Guild settings not configured. use /standup-config to set up the bot for your server."
@@ -22,9 +26,9 @@ export function submitStandup(guildId: string, userId: string, username: string,
     const month = parts.find(p => p.type === "month")!.value;
     const day = parts.find(p => p.type === "day")!.value;
 
-    const standupDate = `${year}-${month}-${day}`;
+        const standupDate = `${year}-${month}-${day}`;
 
-    return upsertStandup(guildId, userId, username, yesterday, today, blockers, standupDate);
+    return upsertStandup(submission, standupDate);
 }
 
 export function getLatestStandupUser(guildId: string, userId: string) {

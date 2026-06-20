@@ -1,7 +1,7 @@
-import type { GuildSettings } from "../types/guildSettings.js";
+import type { GuildSettings } from "../models/GuildSettings.js";
 import { db } from "./db.js";
 
-export function createorUpdateGuildSettings(guildId: string, channelId: string, frequency: string, scheduleTime: string, timezone: string) {
+export function createorUpdateGuildSettings(settings: GuildSettings) {
     const stmt = db.prepare(`
         INSERT INTO guild_settings (
             guild_id,
@@ -19,7 +19,7 @@ export function createorUpdateGuildSettings(guildId: string, channelId: string, 
             schedule_time = excluded.schedule_time,
             timezone = excluded.timezone
     `);
-    stmt.run(guildId, channelId, frequency, scheduleTime, timezone);
+    stmt.run(settings.guildId, settings.channelId, settings.frequency, settings.scheduleTime, settings.timezone);
 }
 
 export function getGuildSettings(
@@ -30,7 +30,7 @@ export function getGuildSettings(
         FROM guild_settings
         WHERE guild_id = ?
     `);
-    
+
     const row = statement.get(guildId);
 
     if (!row) {

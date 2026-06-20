@@ -2,13 +2,15 @@ import {
     PermissionFlagsBits,
     type CommandInteraction,
     type ModalSubmitInteraction,
+    type ButtonInteraction,
 } from "discord.js";
 
-export async function ensureAdministrator(
+export async function ensureAuthorized(
     interaction:
         | CommandInteraction
         | ModalSubmitInteraction
-) {
+        | ButtonInteraction
+) : Promise<boolean> {
 
     if (
         !interaction.memberPermissions?.has(
@@ -18,11 +20,9 @@ export async function ensureAdministrator(
         await interaction.reply({
             content:
                 "✋ You need the **Manage Guild** permission to perform this action.",
-            ephemeral: true,
         });
 
         return false;
     }
-
     return true;
 }
