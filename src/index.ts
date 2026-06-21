@@ -11,7 +11,7 @@ import {loadEvents} from './loaders/loadEvents.js'
 import { migrate } from './database/migrate.js'
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
 })
 
 client.commands = new Collection()

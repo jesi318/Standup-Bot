@@ -1,7 +1,19 @@
 import type { GuildSettings } from "../models/GuildSettings.js";
+import { addMinutesToTime } from "../utils/dateTimeUtils.js";
+
+const MISSING_REMINDER_DELAY_MINUTES = 1;
 
 export function shouldSendReminder(setting: GuildSettings ): boolean {
-    const now = new Date();
+    return isScheduleDue(setting, setting.scheduleTime)
+}
+
+export function shouldSendMissingReminder(setting: GuildSettings): boolean {
+    const missingReminderTime = addMinutesToTime(setting.scheduleTime, MISSING_REMINDER_DELAY_MINUTES);
+    return isScheduleDue(setting, missingReminderTime);
+}
+
+function isScheduleDue(setting: GuildSettings, targetTime: string): boolean {
+        const now = new Date();
     const timeFormatter = new Intl.DateTimeFormat("en-GB", {
         timeZone: setting.timezone,
         hour: "2-digit",
@@ -19,7 +31,7 @@ export function shouldSendReminder(setting: GuildSettings ): boolean {
     const currentWeekday = weekdayFormatter.format(now).toLowerCase();
 
     if (setting.frequency === "daily") {
-        return currentTime === setting.scheduleTime;
+        return currentTime === targetTime;
     }
 
     if (setting.frequency.startsWith("weekly:")) {
@@ -28,7 +40,7 @@ export function shouldSendReminder(setting: GuildSettings ): boolean {
 
         return (
             configuredDay === currentWeekday &&
-            currentTime === setting.scheduleTime
+            currentTime === targetTime
         );
     }
 

@@ -73,3 +73,14 @@ export function getGuildStandupHistory(guildId: string, userId: string, limit: n
   `);
   return stmt.all(guildId, userId, limit, offset);
 }
+
+export function getSubmittedUserIdsForDate(guildId: string, standupDate: string): string[] {
+  const stmt = db.prepare(`
+    SELECT user_id 
+    FROM standups
+    WHERE guild_id = ? 
+    AND standup_date = ?
+  `);
+  const rows = stmt.all(guildId, standupDate) as { user_id: string }[];
+  return rows.map(row => row.user_id);
+}
