@@ -6,9 +6,9 @@ import {
   GatewayIntentBits,
 } from 'discord.js'
 
-import {loadCommands} from './loaders/loadCommands.js'
-import {loadEvents} from './loaders/loadEvents.js'
-import { migrate } from './database/migrate.js'
+import {loadCommands} from './platforms/discord/loaders/loadCommands.js'
+import {loadEvents} from './platforms/discord/loaders/loadEvents.js'
+import { migrate } from './infrastructure/database/migrate.js'
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],

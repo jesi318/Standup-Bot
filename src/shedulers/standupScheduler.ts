@@ -1,12 +1,12 @@
 import type { Client } from "discord.js";
 import cron from "node-cron";
-import { fetchAllGuildSettings } from "../services/guildSettingsService.js";
-import { sendMissingStandupReminder, sendStandupReminder } from "../services/reminderService.js";
+import { fetchAllGuildSettings } from "../app/services/guildSettingsService.js";
+import { sendMissingStandupReminder, sendStandupReminder } from "../app/services/reminderService.js";
 import {
   shouldSendMissingReminder,
   shouldSendReminder,
-} from "../services/scheduleService.js";
-import type { GuildSettings } from "../models/GuildSettings.js";
+} from "../app/services/scheduleService.js";
+import type { GuildSettings } from "../domain/models/GuildSettings.js";
 
 export function startStandupScheduler(client: Client) {
   cron.schedule("* * * * *", async () => {

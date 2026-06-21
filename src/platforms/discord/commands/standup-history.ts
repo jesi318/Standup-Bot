@@ -1,6 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../types/client.js";
-import { getStandupHistory } from "../services/standupService.js";
+import { getStandupHistory } from "../../../app/services/standupService.js";
 import { createHistoryEmbed } from "../components/historyEmbed.js";
 import { createHistoryPagination } from "../components/historyPagination.js";
 const PAGE_SIZE = 5;

@@ -1,11 +1,13 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../types/client.js";
-import { getLatestStandupGuild } from "../services/standupService.js";
+import { getLatestStandupUser } from "../../../app/services/standupService.js";
+
+
 
 const command : SlashCommand = {
     data: new SlashCommandBuilder()
-        .setName("standup-latest")
-        .setDescription("Get the latest standup report for a guild."),
+        .setName("my-standup")
+        .setDescription("Get the latest standup report for a user."),
 
     async execute(interaction) {
         if (!interaction.inGuild()) {
@@ -16,35 +18,36 @@ const command : SlashCommand = {
             return;
         }
 
-       const standup = getLatestStandupGuild(interaction.guildId);
+       const standup = getLatestStandupUser(interaction.guildId, interaction.user.id);
 
-         if (standup.length === 0) {
+         if (!standup) {
             await interaction.reply({
-                content: "No standups have been submitted yet!",
+                content: "No standup report found for you.",
+                ephemeral: true,
             });
             return;
         }  
 
-        const formattedStandups = standup.map((s: any) => `
-            ## ${s.username}'s Latest Standup
+        await interaction.reply({content: `
+            ## Your Latest Standup
 
             **Yesterday**
-            ${s.yesterday}
+            ${standup.yesterday}
 
             **Today**
-            ${s.today}
+            ${standup.today}
 
             **Blockers**
-            ${s.blockers}
+            ${standup.blockers}
 
             **Submitted At**
-            ${s.standup_date}
-        `).join("\n--------------------------\n");
-
-        await interaction.reply({content: formattedStandups});
+            ${standup.standup_date}
+            `,
+        });
         
     },
 
 };
+
 
 export default command;

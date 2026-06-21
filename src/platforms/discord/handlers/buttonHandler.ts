@@ -1,7 +1,7 @@
 import type { ButtonInteraction, CacheType } from "discord.js";
 import { SUBMIT_STANDUP_BUTTON_ID } from "../components/submitStandupButton.js";
 import { createStandupModal } from "../components/standupModal.js";
-import { getStandupHistory } from "../services/standupService.js";
+import { getStandupHistory } from "../../../app/services/standupService.js";
 import { createHistoryEmbed } from "../components/historyEmbed.js";
 import { createHistoryPagination } from "../components/historyPagination.js";
 

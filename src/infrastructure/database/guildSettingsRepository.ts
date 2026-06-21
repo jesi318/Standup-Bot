@@ -1,4 +1,4 @@
-import type { GuildSettings } from "../models/GuildSettings.js";
+import type { GuildSettings } from "../../domain/models/GuildSettings.js";
 import { db } from "./db.js";
 
 export function createorUpdateGuildSettings(settings: GuildSettings) {

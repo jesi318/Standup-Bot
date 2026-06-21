@@ -1,4 +1,4 @@
-import type { ConfigSession } from "../models/ConfigSession.js";
+import type { ConfigSession } from "../../domain/models/ConfigSession.js";
 
 const sessions = new Map<string, ConfigSession>();
 

@@ -1,12 +1,12 @@
-import { getGuildSettings } from "../database/guildSettingsRepository.js";
+import { getGuildSettings } from "../../infrastructure/database/guildSettingsRepository.js";
 import {
   upsertStandup,
   getLatestStandupforGuild,
   getLatestStandupforUser,
   getGuildStandupHistory,
-} from "../database/standupRepository.js";
-import type { StandupSubmission } from "../models/standupSubmission.js";
-import { getLocalDate } from "../utils/dateTimeUtils.js";
+} from "../../infrastructure/database/standupRepository.js";
+import type { StandupSubmission } from "../../domain/models/standupSubmission.js";
+import { getLocalDate } from "../../utils/dateTimeUtils.js";
 import { validateStandup } from "../validators/standupValidator.js";
 
 export function submitStandup(submission: StandupSubmission) {

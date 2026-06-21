@@ -1,4 +1,4 @@
-import type { StandupSubmission } from "../models/standupSubmission.js";
+import type { StandupSubmission } from "../../domain/models/standupSubmission.js";
 import { db } from "./db.js";
 
 export function upsertStandup(submission: StandupSubmission, standupDate: string) {

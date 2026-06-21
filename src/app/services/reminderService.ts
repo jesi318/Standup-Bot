@@ -1,8 +1,8 @@
 import type { Client } from "discord.js";
-import { createSubmitStandupButton } from "../components/submitStandupButton.js";
-import type { GuildSettings } from "../models/GuildSettings.js";
-import { getLocalDate } from "../utils/dateTimeUtils.js";
-import { getSubmittedUserIdsForDate } from "../database/standupRepository.js";
+import { createSubmitStandupButton } from "../../platforms/discord/components/submitStandupButton.js";
+import type { GuildSettings } from "../../domain/models/GuildSettings.js";
+import { getLocalDate } from "../../utils/dateTimeUtils.js";
+import { getSubmittedUserIdsForDate } from "../../infrastructure/database/standupRepository.js";
 
 export async function sendStandupReminder(client: Client, channelId: string) {
     

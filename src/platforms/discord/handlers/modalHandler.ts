@@ -1,16 +1,16 @@
 import { PermissionFlagsBits, type ModalSubmitInteraction } from "discord.js";
-import { submitStandup } from "../services/standupService.js";
+import { submitStandup } from "../../../app/services/standupService.js";
 import { STANDUP_MODAL_ID } from "../components/standupModal.js";
 import { STANDUP_CONFIG_MODAL_ID } from "../components/standupConfigModal.js";
-import { saveGuildSettings } from "../services/guildSettingsService.js";
-import { VALID_WEEKDAYS } from "../utils/constants/weekdays.js";
-import type { StandupSubmission } from "../models/standupSubmission.js";
-import type { GuildSettings } from "../models/GuildSettings.js";
-import { ensureAuthorized } from "../utils/permissions.js";
+import { saveGuildSettings } from "../../../app/services/guildSettingsService.js";
+import { VALID_WEEKDAYS } from "../../../domain/constants/weekdays.js";
+import type { StandupSubmission } from "../../../domain/models/standupSubmission.js";
+import type { GuildSettings } from "../../../domain/models/GuildSettings.js";
+import { ensureAuthorized } from "../../../utils/permissions.js";
 import {
   deleteConfigSession,
   getConfigSession,
-} from "../sessions/configSessionStore.js";
+} from "../../../app/sessions/configSessionStore.js";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
   switch (interaction.customId) {

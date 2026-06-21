@@ -1,5 +1,5 @@
-import type { GuildSettings } from "../models/GuildSettings.js";
-import { addMinutesToTime } from "../utils/dateTimeUtils.js";
+import type { GuildSettings } from "../../domain/models/GuildSettings.js";
+import { addMinutesToTime } from "../../utils/dateTimeUtils.js";
 
 const MISSING_REMINDER_DELAY_MINUTES = 1;
 
