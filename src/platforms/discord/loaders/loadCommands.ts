@@ -6,6 +6,8 @@ export async function loadCommands(client: Client) {
     const commandPaths = path.join(
         process.cwd(),
         "src",
+        "platforms",
+        "discord",
         "commands"
     );
 

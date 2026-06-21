@@ -1,8 +1,8 @@
 import { VALID_WEEKDAYS } from "../../domain/constants/weekdays.js";
 import { createorUpdateGuildSettings, getAllGuildSettings, getGuildSettings } from "../../infrastructure/database/guildSettingsRepository.js";
 import type { GuildSettings } from "../../domain/models/GuildSettings.js";
-import { validateGuildSettings } from "../../validators/guildConfigValidator.js";
-import { normalizeGuildSettings } from "../../normalizers/guildSettingsNormalizer.js";
+import { validateGuildSettings } from "../validators/guildConfigValidator.js";
+import { normalizeGuildSettings } from "../normalizers/guildSettingsNormalizer.js";
 
 export function saveGuildSettings(settings: GuildSettings) {
 

@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "deploy": "tsx src/deploy-commands.ts",
-    "seed:standups": "tsx src/database/seedStandups.ts",
+    "deploy": "tsx src/platforms/discord/deploy-commands.ts",
+    "seed:standups": "tsx src/infrastructure/database/seedStandups.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },

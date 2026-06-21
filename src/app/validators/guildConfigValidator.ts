@@ -1,7 +1,7 @@
 import type {
     GuildSettings,
-} from "../models/GuildSettings.js";
-import { VALID_WEEKDAYS } from "../utils/constants/weekdays.js";
+} from "../../domain/models/GuildSettings.js";
+import { VALID_WEEKDAYS } from "../../domain/constants/weekdays.js";
 
 
 export function validateGuildSettings(

@@ -5,7 +5,7 @@ import { REST, Routes } from "discord.js";
 
 const commands = []
 
-const commandPath = path.join(process.cwd(), "src", "commands")
+const commandPath = path.join(process.cwd(), "src", "platforms", "discord", "commands")
 
 const commandFiles = await fs.readdirSync(commandPath).filter(file => file.endsWith(".ts"));
 

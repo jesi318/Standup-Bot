@@ -6,6 +6,8 @@ export async function loadEvents(client: Client) {
     const eventPaths = path.join(
         process.cwd(),
         "src",
+        "platforms",
+        "discord",
         "events"
     );
 
