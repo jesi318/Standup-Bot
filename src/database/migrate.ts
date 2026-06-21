@@ -34,6 +34,7 @@ export function migrate() {
         frequency TEXT NOT NULL,
         schedule_time TEXT NOT NULL,
         timezone TEXT NOT NULL
+        role_id TEXT NOT NULL
     );
 `);
 }

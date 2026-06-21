@@ -3,6 +3,7 @@ import {
     type CommandInteraction,
     type ModalSubmitInteraction,
     type ButtonInteraction,
+    RoleSelectMenuInteraction,
 } from "discord.js";
 
 export async function ensureAuthorized(
@@ -10,6 +11,7 @@ export async function ensureAuthorized(
         | CommandInteraction
         | ModalSubmitInteraction
         | ButtonInteraction
+        | RoleSelectMenuInteraction
 ) : Promise<boolean> {
 
     if (

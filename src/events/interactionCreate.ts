@@ -3,6 +3,7 @@ import { handleCommand } from "../handlers/commandHandler.js";
 import { handleButton } from "../handlers/buttonHandler.js";
 import { handleModalSubmit } from "../handlers/modalHandler.js";
 import { replyWithError } from "../utils/replyWithError.js";
+import { handleRoleSelect } from "../handlers/roleSelectHandler.js";
 
 export default {
     name: Events.InteractionCreate,
@@ -16,6 +17,9 @@ export default {
             }
             if (interaction.isModalSubmit()) {
                 return handleModalSubmit(interaction);
+            }
+            if (interaction.isRoleSelectMenu()) {
+                return handleRoleSelect(interaction);
             }
         } catch (error) {
             console.error("Error occurred while handling interaction:", error);

@@ -3,5 +3,6 @@ export interface GuildSettings {
     channelId: string,
     frequency: string,
     scheduleTime: string,
-    timezone: string
+    timezone: string,
+    roleId: string,    
 }

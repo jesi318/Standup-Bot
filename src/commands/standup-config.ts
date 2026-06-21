@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../types/client.js";
 import { createStandupConfigModal } from "../components/standupConfigModal.js";
 import { ensureAuthorized } from "../utils/permissions.js";
+import { createStandupRoleSelect } from "../components/standupRoleSelect.js";
 
 const command : SlashCommand = {
     data: new SlashCommandBuilder()
@@ -9,15 +10,17 @@ const command : SlashCommand = {
         .setDescription("Configure your standup settings."),
 
     async execute(interaction) {
-       const isAdmin = await ensureAuthorized(interaction);
+       const isAuthorized = await ensureAuthorized(interaction);
         
-       if (!isAdmin) {
+       if (!isAuthorized) {
             return;
         }
         
-        await interaction.showModal(
-            createStandupConfigModal()
-        );
+        await interaction.reply({
+            content : "Please selct the role that should submit standups",
+            components: [createStandupRoleSelect()],
+            ephemeral: true,
+        });
     }
 }
 

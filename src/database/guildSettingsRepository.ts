@@ -9,17 +9,19 @@ export function createorUpdateGuildSettings(settings: GuildSettings) {
             frequency,
             schedule_time,
             timezone
+            role_id
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
 
         ON CONFLICT(guild_id)
         DO UPDATE SET
             channel_id = excluded.channel_id,
             frequency = excluded.frequency,
             schedule_time = excluded.schedule_time,
-            timezone = excluded.timezone
+            timezone = excluded.timezone,
+            role_id = excluded.role_id
     `);
-    stmt.run(settings.guildId, settings.channelId, settings.frequency, settings.scheduleTime, settings.timezone);
+    stmt.run(settings.guildId, settings.channelId, settings.frequency, settings.scheduleTime, settings.timezone, settings.roleId);
 }
 
 export function getGuildSettings(
@@ -56,5 +58,6 @@ function toGuildSettings(row: any): GuildSettings {
         frequency: row.frequency,
         scheduleTime: row.schedule_time,
         timezone: row.timezone,
+        roleId: row.role_id
     };
 }
