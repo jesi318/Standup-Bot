@@ -8,7 +8,7 @@ export function createorUpdateGuildSettings(settings: GuildSettings) {
             channel_id,
             frequency,
             schedule_time,
-            timezone
+            timezone,
             role_id
         )
         VALUES (?, ?, ?, ?, ?, ?)
