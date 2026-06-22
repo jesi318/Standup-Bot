@@ -5,7 +5,7 @@ import {
   getLatestStandupforUser,
   getGuildStandupHistory,
 } from "../../infrastructure/database/standupRepository.js";
-import type { StandupSubmission } from "../../domain/models/standupSubmission.js";
+import type { StandupSubmission } from "../../domain/models/StandupSubmission.js";
 import { getLocalDate } from "../../utils/dateTimeUtils.js";
 import { validateStandup } from "../validators/standupValidator.js";
 

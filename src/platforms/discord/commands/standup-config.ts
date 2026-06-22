@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../types/client.js";
 import { createStandupConfigModal } from "../components/standupConfigModal.js";
-import { ensureAuthorized } from "../../../utils/permissions.js";
+import { ensureAuthorized } from "../utils/permissions.js";
 import { createStandupRoleSelect } from "../components/standupRoleSelect.js";
 
 const command: SlashCommand = {

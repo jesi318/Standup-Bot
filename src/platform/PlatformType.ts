@@ -1,0 +1,1 @@
+export type PlatformType = "discord" | "slack" | "microsoft-teams";

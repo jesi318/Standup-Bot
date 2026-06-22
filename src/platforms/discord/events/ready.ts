@@ -1,5 +1,5 @@
 import { Client, Events } from "discord.js"
-import { startStandupScheduler } from "../../../shedulers/standupScheduler.js"
+import { startStandupScheduler } from "../../../schedulers/standupScheduler.js"
 
 const readyEvent = {
   name: Events.ClientReady,

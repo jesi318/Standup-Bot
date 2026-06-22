@@ -6,3 +6,4 @@ export interface GuildSettings {
     timezone: string,
     roleId: string,    
 }
+1

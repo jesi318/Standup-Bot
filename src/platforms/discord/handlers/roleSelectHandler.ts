@@ -1,6 +1,6 @@
 import type { RoleSelectMenuInteraction } from "discord.js";
 import { STANDUP_ROLE_SELECT_ID } from "../components/standupRoleSelect.js";
-import { ensureAuthorized } from "../../../utils/permissions.js";
+import { ensureAuthorized } from "../utils/permissions.js";
 import { createConfigSession } from "../../../app/sessions/configSessionStore.js";
 import type { ConfigSession } from "../../../domain/models/ConfigSession.js";
 import { createStandupConfigModal } from "../components/standupConfigModal.js";
