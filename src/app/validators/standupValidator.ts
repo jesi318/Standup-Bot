@@ -1,4 +1,4 @@
-import type { StandupSubmission } from "../models/standupSubmission.js";
+import type { StandupSubmission } from "../../domain/models/StandupSubmission.js";
 
 export function validateStandup(submission: StandupSubmission): boolean {
     if (!submission.yesterday.trim()) {

@@ -1,18 +1,18 @@
-import type { GuildSettings } from "../../domain/models/GuildSettings.js";
+import type { StandupConfig } from "../../domain/models/StandupConfig.js";
 import { addMinutesToTime } from "../../utils/dateTimeUtils.js";
 
 const MISSING_REMINDER_DELAY_MINUTES = 1;
 
-export function shouldSendReminder(setting: GuildSettings ): boolean {
+export function shouldSendReminder(setting: StandupConfig ): boolean {
     return isScheduleDue(setting, setting.scheduleTime)
 }
 
-export function shouldSendMissingReminder(setting: GuildSettings): boolean {
+export function shouldSendMissingReminder(setting: StandupConfig): boolean {
     const missingReminderTime = addMinutesToTime(setting.scheduleTime, MISSING_REMINDER_DELAY_MINUTES);
     return isScheduleDue(setting, missingReminderTime);
 }
 
-function isScheduleDue(setting: GuildSettings, targetTime: string): boolean {
+function isScheduleDue(setting: StandupConfig, targetTime: string): boolean {
         const now = new Date();
     const timeFormatter = new Intl.DateTimeFormat("en-GB", {
         timeZone: setting.timezone,

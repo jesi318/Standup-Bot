@@ -1,8 +1,8 @@
 import type { Client } from "discord.js";
 import { createSubmitStandupButton } from "../../platforms/discord/components/submitStandupButton.js";
-import type { GuildSettings } from "../../domain/models/GuildSettings.js";
 import { getLocalDate } from "../../utils/dateTimeUtils.js";
 import { getSubmittedUserIdsForDate } from "../../infrastructure/database/standupRepository.js";
+import type { StandupConfig } from "../../domain/models/StandupConfig.js";
 
 export async function sendStandupReminder(client: Client, channelId: string) {
     
@@ -20,18 +20,18 @@ export async function sendStandupReminder(client: Client, channelId: string) {
     });
 }
 
-export async function sendMissingStandupReminder(client: Client, setting: GuildSettings) {
-    const guild = await client.guilds.fetch(setting.guildId);
+export async function sendMissingStandupReminder(client: Client, setting: StandupConfig) {
+    const guild = await client.guilds.fetch(setting.workspaceId);
     const channel = await guild.channels.fetch(setting.channelId);
     
     if (!channel || !channel.isTextBased() || channel.isDMBased()) {
         throw new Error(`Channel not found or not text-based: ${setting.channelId}`);
     }
 
-    const role = await guild.roles.fetch(setting.roleId);
+    const role = await guild.roles.fetch(setting.participantGroupId);
     
     if (!role) {
-        throw new Error(`Role  ${setting.roleId} configured for standup not found`);
+        throw new Error(`Role  ${setting.participantGroupId} configured for standup not found`);
     }
     
     const expectedMembers = role.members.filter(member => !member.user.bot && member.roles.cache.has(role.id));
@@ -41,7 +41,7 @@ export async function sendMissingStandupReminder(client: Client, setting: GuildS
     }
 
     const standupDate = getLocalDate(setting.timezone);
-    const submittedUserIds = await getSubmittedUserIdsForDate(setting.guildId, standupDate);
+    const submittedUserIds = await getSubmittedUserIdsForDate(setting.workspaceId, standupDate);
 
     const missingMembers = expectedMembers.filter(member => !submittedUserIds.includes(member.id));
 

@@ -1,7 +1,8 @@
-import type { GuildSettings } from "../../domain/models/GuildSettings.js";
+
+import type { StandupConfig } from "../../domain/models/StandupConfig.js";
 import { db } from "./db.js";
 
-export function createorUpdateGuildSettings(settings: GuildSettings) {
+export function createorUpdateStandupConfig(settings: StandupConfig) {
     const stmt = db.prepare(`
         INSERT INTO guild_settings (
             guild_id,
@@ -21,10 +22,10 @@ export function createorUpdateGuildSettings(settings: GuildSettings) {
             timezone = excluded.timezone,
             role_id = excluded.role_id
     `);
-    stmt.run(settings.guildId, settings.channelId, settings.frequency, settings.scheduleTime, settings.timezone, settings.roleId);
+    stmt.run(settings.workspaceId, settings.channelId, settings.frequency, settings.scheduleTime, settings.timezone, settings.participantGroupId);
 }
 
-export function getGuildSettings(
+export function getStandupConfig(
     guildId: string
 ) {
     const statement = db.prepare(`
@@ -39,25 +40,26 @@ export function getGuildSettings(
         return undefined;
     }
 
-    return toGuildSettings(row);
+    return toStandupConfig(row);
 }
 
-export function getAllGuildSettings() {
+export function getAllStandupConfigs() {
     const statement = db.prepare(`
         SELECT *
         FROM guild_settings
     `);
 
-    return statement.all().map(toGuildSettings);
+    return statement.all().map(toStandupConfig);
 }
 
-function toGuildSettings(row: any): GuildSettings {
+function toStandupConfig(row: any): StandupConfig {
     return {
-        guildId: row.guild_id,
+        workspaceId: row.guild_id,
+        platform: "discord",
         channelId: row.channel_id,
         frequency: row.frequency,
         scheduleTime: row.schedule_time,
         timezone: row.timezone,
-        roleId: row.role_id
+        participantGroupId: row.role_id
     };
 }

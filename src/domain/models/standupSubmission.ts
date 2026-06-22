@@ -1,5 +1,5 @@
 export interface StandupSubmission {
-    guildId: string;
+    workspaceId: string;
     userId: string;
     yesterday: string;
     username: string;

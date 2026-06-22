@@ -1,5 +1,5 @@
 export interface ConfigSession {
-    guildId: string;
+    workspaceId: string;
     userId: string;
-    roleId: string;
+    participantGroupId: string;
 }

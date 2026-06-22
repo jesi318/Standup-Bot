@@ -1,4 +1,4 @@
-import { getGuildSettings } from "../../infrastructure/database/guildSettingsRepository.js";
+import { getStandupConfig } from "../../infrastructure/database/standupConfigRepository.js";
 import {
   upsertStandup,
   getLatestStandupforGuild,
@@ -10,7 +10,7 @@ import { getLocalDate } from "../../utils/dateTimeUtils.js";
 import { validateStandup } from "../validators/standupValidator.js";
 
 export function submitStandup(submission: StandupSubmission) {
-  const settings = getGuildSettings(submission.guildId);
+  const settings = getStandupConfig(submission.workspaceId);
 
   validateStandup(submission);
 

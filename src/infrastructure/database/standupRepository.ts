@@ -20,7 +20,7 @@ export function upsertStandup(submission: StandupSubmission, standupDate: string
             today = excluded.today,
             blockers = excluded.blockers
   `);
-  stmt.run(submission.guildId,
+  stmt.run(submission.workspaceId,
     submission.userId,
     submission.username,
     submission.yesterday,
@@ -29,25 +29,25 @@ export function upsertStandup(submission: StandupSubmission, standupDate: string
     standupDate);
 }
 
-export function getStandupByDate(guildId: string, userId: string, standupDate: string) {
+export function getStandupByDate(workspaceId: string, userId: string, standupDate: string) {
   const stmt = db.prepare(`
     SELECT * FROM standups
     WHERE guild_id = ? AND user_id = ? AND standup_date = ?
   `);
-  return stmt.get(guildId, userId, standupDate);
+  return stmt.get(workspaceId, userId, standupDate);
 }
 
-export function getLatestStandupforUser(guildId: string, userId: string) {
+export function getLatestStandupforUser(workspaceId: string, userId: string) {
   const stmt = db.prepare(`
     SELECT * FROM standups
     WHERE guild_id = ? AND user_id = ?
     ORDER BY standup_date DESC
     LIMIT 1
   `);
-  return stmt.get(guildId, userId);
+  return stmt.get(workspaceId, userId);
 }
 
-export function getLatestStandupforGuild(guildId: string) {
+export function getLatestStandupforGuild(workspaceId: string) {
   const stmt = db.prepare(`
     SELECT s1.*
     FROM standups s1
@@ -60,10 +60,10 @@ export function getLatestStandupforGuild(guildId: string) {
     )
     ORDER BY s1.username 
   `);
-  return stmt.all(guildId);
+  return stmt.all(workspaceId);
 }
 
-export function getGuildStandupHistory(guildId: string, userId: string, limit: number, offset: number) {
+export function getGuildStandupHistory(workspaceId: string, userId: string, limit: number, offset: number) {
   const stmt = db.prepare(`
     SELECT * FROM standups
     WHERE guild_id = ? AND user_id = ?
@@ -71,16 +71,16 @@ export function getGuildStandupHistory(guildId: string, userId: string, limit: n
     LIMIT ?
     OFFSET ?
   `);
-  return stmt.all(guildId, userId, limit, offset);
+  return stmt.all(workspaceId, userId, limit, offset);
 }
 
-export function getSubmittedUserIdsForDate(guildId: string, standupDate: string): string[] {
+export function getSubmittedUserIdsForDate(workspaceId: string, standupDate: string): string[] {
   const stmt = db.prepare(`
     SELECT user_id 
     FROM standups
     WHERE guild_id = ? 
     AND standup_date = ?
   `);
-  const rows = stmt.all(guildId, standupDate) as { user_id: string }[];
+  const rows = stmt.all(workspaceId, standupDate) as { user_id: string }[];
   return rows.map(row => row.user_id);
 }

@@ -33,7 +33,7 @@ export async function handleRoleSelect(interaction: RoleSelectMenuInteraction) {
         return;
     }
 
-    const session: ConfigSession = { guildId: interaction.guildId, userId: interaction.user.id, roleId: roleid };
+    const session: ConfigSession = { workspaceId: interaction.guildId, userId: interaction.user.id, participantGroupId: roleid };
 
     createConfigSession(session);
 

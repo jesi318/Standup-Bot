@@ -1,10 +1,8 @@
-import type {
-    GuildSettings,
-} from "../models/GuildSettings.js";
+import type { StandupConfig } from "../../domain/models/StandupConfig.js";
 
-export function normalizeGuildSettings(
-    settings: GuildSettings
-): GuildSettings {
+export function normalizeStandupConfig(
+    settings: StandupConfig
+): StandupConfig {
 
     return {
 
