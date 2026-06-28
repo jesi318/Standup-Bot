@@ -15,8 +15,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@slack/web-api": "^7.17.0",
     "@types/node": "^25.9.1",
     "better-sqlite3": "^12.10.0",
+    "botbuilder": "^4.23.3",
     "discord.js": "^14.26.4",
     "dotenv": "^17.4.2",
     "node-cron": "^4.2.1",
