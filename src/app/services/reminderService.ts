@@ -1,58 +1,54 @@
-import type { Client } from "discord.js";
-import { createSubmitStandupButton } from "../../platforms/discord/components/submitStandupButton.js";
 import { getLocalDate } from "../../utils/dateTimeUtils.js";
-import { getSubmittedUserIdsForDate } from "../../infrastructure/database/standupRepository.js";
 import type { StandupConfig } from "../../domain/models/StandupConfig.js";
+import type { PlatformAdapter } from "../../platform/PlatformAdapter.js";
+import { getSubmittedUserIdsForDate } from "../../infrastructure/database/standupRepository.js";
 
-export async function sendStandupReminder(client: Client, channelId: string) {
-    
-    const channel = await client.channels.fetch(channelId);
-
-    if(!channel || !channel.isTextBased() || channel.isDMBased()) {
-        throw new Error(`Channel not found or not text-based: ${channelId}`);
-    }
-    
-    await channel.send({
-        content: "## 👥💬 Daily Standup\n\nClick below to submit your standup.",
-        components: [
-            createSubmitStandupButton()
-        ]
-    });
+export interface ReminderService {
+    sendStandupReminder(config: StandupConfig): Promise<void>;
+    sendMissingStandupReminder(config: StandupConfig): Promise<void>;
 }
 
-export async function sendMissingStandupReminder(client: Client, setting: StandupConfig) {
-    const guild = await client.guilds.fetch(setting.workspaceId);
-    const channel = await guild.channels.fetch(setting.channelId);
-    
-    if (!channel || !channel.isTextBased() || channel.isDMBased()) {
-        throw new Error(`Channel not found or not text-based: ${setting.channelId}`);
-    }
 
-    const role = await guild.roles.fetch(setting.participantGroupId);
-    
-    if (!role) {
-        throw new Error(`Role  ${setting.participantGroupId} configured for standup not found`);
-    }
-    
-    const expectedMembers = role.members.filter(member => !member.user.bot && member.roles.cache.has(role.id));
+export function createReminderService(dependencies: { platformAdapter: PlatformAdapter }): ReminderService {const {
+    platformAdapter,
+} = dependencies;
 
-    if (expectedMembers.size === 0) {
-        return;
-    }
+    return {
+        async sendStandupReminder(config: StandupConfig): Promise<void> {
+            await platformAdapter.sendChannelMessage(config.channelId, {
+                text: "## 👥💬 Daily Standup\n\nClick below to submit your standup.",
+                actions: [
+                    {
+                        id: "submit_standup",
+                        label: "Submit Standup"
+                    }
+                ]
+            });
+        },
 
-    const standupDate = getLocalDate(setting.timezone);
-    const submittedUserIds = await getSubmittedUserIdsForDate(setting.workspaceId, standupDate);
+        async sendMissingStandupReminder(config: StandupConfig): Promise<void> {
+            const participants = await platformAdapter.getParticipants(config.workspaceId, config.participantGroupId);
 
-    const missingMembers = expectedMembers.filter(member => !submittedUserIds.includes(member.id));
+            const expectedParticipants = participants.filter(participant => !participant.isBot);
+            
+            if (expectedParticipants.length === 0) {
+                return;
+            }
 
-    if (missingMembers.size === 0) {
-        return;
-    }
+            const standupDate = getLocalDate(config.timezone);
+            const submittedUserIds =  new Set (getSubmittedUserIdsForDate(config.workspaceId, standupDate));
 
-    const mentions = missingMembers.map(member => `<@${member.id}>`).join(", ");
+            const missingParticipants = expectedParticipants.filter(participant => !submittedUserIds.has(participant.id));
 
-    await channel.send({
-        content:
-            `Standup reminder: ${mentions}\n\nYou have not submitted today's standup yet.`,
-    });
+            if (missingParticipants.length === 0) {
+                return;
+            }
+            
+            const mentions = missingParticipants.map(participant => platformAdapter.formatMention(participant.id)).join(", ");
+
+            await platformAdapter.sendChannelMessage(config.channelId, {
+                text: `Standup reminder: ${mentions}\n\nYou have not submitted today's standup yet.`
+            });
+        }
+    };
 }

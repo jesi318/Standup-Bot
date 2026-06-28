@@ -2,7 +2,7 @@ import { PermissionFlagsBits, type ModalSubmitInteraction } from "discord.js";
 import { submitStandup } from "../../../app/services/standupService.js";
 import { STANDUP_MODAL_ID } from "../components/standupModal.js";
 import { STANDUP_CONFIG_MODAL_ID } from "../components/standupConfigModal.js";
-import { saveStandupConfig } from "../../../app/services/StandupConfigService.js";
+import { saveStandupConfig } from "../../../app/services/standupConfigService.js";
 import { VALID_WEEKDAYS } from "../../../domain/constants/weekdays.js";
 import type { StandupSubmission } from "../../../domain/models/StandupSubmission.js";
 import { ensureAuthorized } from "../utils/permissions.js";
@@ -11,6 +11,7 @@ import {
   getConfigSession,
 } from "../../../app/sessions/configSessionStore.js";
 import type { StandupConfig } from "../../../domain/models/StandupConfig.js";
+import { toStandupConfigFromDiscord } from "../mappers/discordStandupConfigMapper.js";
 
 export async function handleModalSubmit(interaction: ModalSubmitInteraction) {
   switch (interaction.customId) {
@@ -50,20 +51,23 @@ async function handleStandupConfigModalSubmit(
       return;
     }
 
-    const settings: StandupConfig = {
-      workspaceId: interaction.guildId!,
-      platform: "discord",
-      channelId: interaction.channelId!,
-      frequency: interaction.fields
-        .getTextInputValue("frequency")
-        .trim()
-        .toLowerCase(),
-      scheduleTime: interaction.fields.getTextInputValue("time").trim(),
-      timezone: interaction.fields.getTextInputValue("timezone").trim(),
-      participantGroupId: session.participantGroupId,
-    };
+    const config =  toStandupConfigFromDiscord({
+        guildId: interaction.guildId!,
+        channelId: interaction.channelId!,
+        roleId: session.participantGroupId,
+        frequency: interaction.fields
+            .getTextInputValue("frequency")
+            .trim()
+            .toLowerCase(),
+        scheduleTime: interaction.fields
+            .getTextInputValue("time")
+            .trim(),
+        timezone: interaction.fields
+            .getTextInputValue("timezone")
+            .trim(),
+    });
 
-    const validationError = ValidateGuildSettingsInput(settings);
+    const validationError = ValidateStandupConfigInput(config );
 
     if (validationError) {
       await interaction.reply({
@@ -72,11 +76,11 @@ async function handleStandupConfigModalSubmit(
       });
       return;
     }
-    saveStandupConfig(settings);
+    saveStandupConfig(config);
 
     deleteConfigSession(interaction.guildId!, interaction.user.id);
     await interaction.reply({
-      content: `Standup settings updated successfully to **${settings.frequency}** at **${settings.scheduleTime}** ${settings.timezone} 🗓️`,
+      content: `Standup settings updated successfully to **${config.frequency}** at **${config.scheduleTime}** ${config.timezone} 🗓️`,
     });
   } catch (error) {
     await interaction.reply({
@@ -161,7 +165,7 @@ function constructStandupSubmission(
   };
 }
 
-function ValidateGuildSettingsInput(settings: StandupConfig): string | null {
+function ValidateStandupConfigInput(settings: StandupConfig): string | null {
   if (!isValidFrequencyInput(settings.frequency)) {
     return "Invalid frequency. Please enter 'daily' or 'weekly:weekday'.";
   }

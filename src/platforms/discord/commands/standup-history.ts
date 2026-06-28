@@ -27,7 +27,6 @@ const command: SlashCommand = {
     }
 
     await interaction.deferReply({
-      flags: MessageFlags.Ephemeral,
     });
 
     const history = getStandupHistory(

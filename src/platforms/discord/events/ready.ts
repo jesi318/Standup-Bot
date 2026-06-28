@@ -1,5 +1,9 @@
 import { Client, Events } from "discord.js"
 import { startStandupScheduler } from "../../../schedulers/standupScheduler.js"
+import { createDiscordAdapter } from "../discordAdapter.js"
+import { createReminderService } from "../../../app/services/reminderService.js"
+import { fetchAllStandupConfigs } from "../../../app/services/standupConfigService.js"
+import { shouldSendMissingReminder, shouldSendReminder } from "../../../app/services/scheduleService.js"
 
 const readyEvent = {
   name: Events.ClientReady,
@@ -10,7 +14,9 @@ const readyEvent = {
       `Ready! Logged in as ${client.user.tag}`
     )
 
-    startStandupScheduler(client)
+    const discordAdapter = createDiscordAdapter(client)
+    const reminderService = createReminderService({ platformAdapter: discordAdapter })
+    startStandupScheduler({ fetchAllStandupConfigs, shouldSendReminder, shouldSendMissingReminder, reminderService })
   },
 }
 

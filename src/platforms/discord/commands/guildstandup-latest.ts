@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import type { SlashCommand } from "../types/client.js";
-import { getLatestStandupGuild } from "../../../app/services/standupService.js";
+import { getLatestStandupWorkspace } from "../../../app/services/standupService.js";
 
 const command : SlashCommand = {
     data: new SlashCommandBuilder()
@@ -16,7 +16,7 @@ const command : SlashCommand = {
             return;
         }
 
-       const standup = getLatestStandupGuild(interaction.guildId);
+       const standup = getLatestStandupWorkspace(interaction.guildId);
 
          if (standup.length === 0) {
             await interaction.reply({

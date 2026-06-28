@@ -1,9 +1,7 @@
+import type { PlatformAction } from "./PlatformAction.js";
+
 export interface PlatformMessage {
     text: string;
     actions?: PlatformAction[];
 }
 
-export interface PlatformAction {
-    id: string;
-    label: string;
-}

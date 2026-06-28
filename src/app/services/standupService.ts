@@ -1,9 +1,9 @@
 import { getStandupConfig } from "../../infrastructure/database/standupConfigRepository.js";
 import {
   upsertStandup,
-  getLatestStandupforGuild,
+  getLatestStandupforWorkspace,
   getLatestStandupforUser,
-  getGuildStandupHistory,
+  getWorkspaceStandupHistory,
 } from "../../infrastructure/database/standupRepository.js";
 import type { StandupSubmission } from "../../domain/models/StandupSubmission.js";
 import { getLocalDate } from "../../utils/dateTimeUtils.js";
@@ -16,7 +16,7 @@ export function submitStandup(submission: StandupSubmission) {
 
   if (!settings) {
     throw new Error(
-      "Guild settings not configured. use /standup-config to set up the bot for your server.",
+      "Standup settings not configured. use /standup-config to set up the bot for your server.",
     );
   }
 
@@ -24,19 +24,19 @@ export function submitStandup(submission: StandupSubmission) {
   return upsertStandup(submission, standupDate);
 }
 
-export function getLatestStandupUser(guildId: string, userId: string) {
-  return getLatestStandupforUser(guildId, userId);
+export function getLatestStandupUser(workspaceId: string, userId: string) {
+  return getLatestStandupforUser(workspaceId, userId);
 }
 
-export function getLatestStandupGuild(guildId: string) {
-  return getLatestStandupforGuild(guildId);
+export function getLatestStandupWorkspace(workspaceId: string) {
+  return getLatestStandupforWorkspace(workspaceId);
 }
 
 export function getStandupHistory(
-  guildId: string,
+  workspaceId: string,
   userId: string,
   limit: number = 5,
   offset: number = 0,
 ) {
-  return getGuildStandupHistory(guildId, userId, limit, offset);
+  return getWorkspaceStandupHistory(workspaceId, userId, limit, offset);
 }

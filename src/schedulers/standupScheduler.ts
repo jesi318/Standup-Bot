@@ -1,32 +1,36 @@
-import type { Client } from "discord.js";
 import cron from "node-cron";
-import { fetchAllStandupConfigs } from "../app/services/StandupConfigService.js";
-import { sendMissingStandupReminder, sendStandupReminder } from "../app/services/reminderService.js";
-import {
-  shouldSendMissingReminder,
-  shouldSendReminder,
-} from "../app/services/scheduleService.js";
+
 import type { StandupConfig } from "../domain/models/StandupConfig.js";
+import type { ReminderService } from "../app/services/reminderService.js";
 
-export function startStandupScheduler(client: Client) {
+interface StandupSchedulerDependencies {
+    fetchAllStandupConfigs: () => StandupConfig[];
+    shouldSendReminder: (config: StandupConfig) => boolean;
+    shouldSendMissingReminder: (config: StandupConfig) => boolean;
+    reminderService: ReminderService;
+}
+
+export function startStandupScheduler(dependencies: StandupSchedulerDependencies) {
+    const { fetchAllStandupConfigs,
+        shouldSendReminder,
+        shouldSendMissingReminder,
+        reminderService, } = dependencies;
+        
   cron.schedule("* * * * *", async () => {
-    const settings: StandupConfig[] = fetchAllStandupConfigs();
+    const configs: StandupConfig[] = fetchAllStandupConfigs();
 
-    for (const setting of settings) {
+    for (const config of configs) {
       try {
-        if (shouldSendReminder(setting)) {
-           await sendStandupReminder(client, setting.channelId);
+        if (shouldSendReminder(config)) {
+          await reminderService.sendStandupReminder(config);
         }
 
-        if (shouldSendMissingReminder(setting)) {
-          await sendMissingStandupReminder(
-            client,
-            setting,
-          );
+        if (shouldSendMissingReminder(config)) {
+          await reminderService.sendMissingStandupReminder(config);
         }
       } catch (error) {
         console.error(
-          `Failed to send reminder for guild ${setting.workspaceId}`,
+          `Scheduler failed for workspace ${config.workspaceId}`,
           error,
         );
       }

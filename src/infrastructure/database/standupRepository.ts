@@ -47,7 +47,7 @@ export function getLatestStandupforUser(workspaceId: string, userId: string) {
   return stmt.get(workspaceId, userId);
 }
 
-export function getLatestStandupforGuild(workspaceId: string) {
+export function getLatestStandupforWorkspace(workspaceId: string) {
   const stmt = db.prepare(`
     SELECT s1.*
     FROM standups s1
@@ -63,7 +63,7 @@ export function getLatestStandupforGuild(workspaceId: string) {
   return stmt.all(workspaceId);
 }
 
-export function getGuildStandupHistory(workspaceId: string, userId: string, limit: number, offset: number) {
+export function getWorkspaceStandupHistory(workspaceId: string, userId: string, limit: number, offset: number) {
   const stmt = db.prepare(`
     SELECT * FROM standups
     WHERE guild_id = ? AND user_id = ?

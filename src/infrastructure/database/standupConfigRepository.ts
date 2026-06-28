@@ -1,8 +1,11 @@
 
 import type { StandupConfig } from "../../domain/models/StandupConfig.js";
+import { toStandupConfig, toStandupConfigParams, type StandupConfigRow } from "../../platforms/discord/mappers/standupConfigRowMapper.js";
 import { db } from "./db.js";
 
-export function createorUpdateStandupConfig(settings: StandupConfig) {
+export function createorUpdateStandupConfig(config: StandupConfig) {
+    const row = toStandupConfigParams(config);
+    
     const stmt = db.prepare(`
         INSERT INTO guild_settings (
             guild_id,
@@ -22,19 +25,19 @@ export function createorUpdateStandupConfig(settings: StandupConfig) {
             timezone = excluded.timezone,
             role_id = excluded.role_id
     `);
-    stmt.run(settings.workspaceId, settings.channelId, settings.frequency, settings.scheduleTime, settings.timezone, settings.participantGroupId);
+    stmt.run(row.workspaceId, row.channelId, row.frequency, row.scheduleTime, row.timezone, row.participantGroupId);
 }
 
 export function getStandupConfig(
-    guildId: string
-) {
+    workspaceId: string
+) : StandupConfig | undefined {
     const statement = db.prepare(`
         SELECT *
         FROM guild_settings
         WHERE guild_id = ?
     `);
 
-    const row = statement.get(guildId);
+    const row = statement.get(workspaceId) as StandupConfigRow | undefined;
 
     if (!row) {
         return undefined;
@@ -43,23 +46,13 @@ export function getStandupConfig(
     return toStandupConfig(row);
 }
 
-export function getAllStandupConfigs() {
+export function getAllStandupConfigs() : StandupConfig[] {
     const statement = db.prepare(`
         SELECT *
         FROM guild_settings
     `);
 
-    return statement.all().map(toStandupConfig);
+    const rows = statement.all() as StandupConfigRow[];
+    return rows.map(toStandupConfig);
 }
 
-function toStandupConfig(row: any): StandupConfig {
-    return {
-        workspaceId: row.guild_id,
-        platform: "discord",
-        channelId: row.channel_id,
-        frequency: row.frequency,
-        scheduleTime: row.schedule_time,
-        timezone: row.timezone,
-        participantGroupId: row.role_id
-    };
-}
